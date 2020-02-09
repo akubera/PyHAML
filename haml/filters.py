@@ -1,14 +1,15 @@
 import subprocess
-import cgi
+import html
 
 from six import StringIO
+
 
 def plain(src):
     return src
 
 
 def escaped(src):
-    return cgi.escape(src)
+    return html.escape(src, False)
 
 
 def cdata(src, comment=False):
@@ -40,7 +41,7 @@ def sass(src, scss=False):
     if out:
         out = css(out.rstrip().decode('utf-8'))
     if err:
-        out += '<div class="sass-error">%s</div>' % cgi.escape(err.decode('utf-8'))
+        out += '<div class="sass-error">%s</div>' % escaped(err.decode('utf-8'))
     return out
 
 
@@ -62,7 +63,7 @@ def coffeescript(src):
     if out:
         out = javascript(out)
     if err:
-        out += '<div class="coffeescript-error">%s</div>' % cgi.escape(err)
+        out += '<div class="coffeescript-error">%s</div>' % escaped(err)
     return out.decode('utf-8')
 
 

@@ -1,19 +1,11 @@
-from itertools import chain
-import cgi
-import collections
-import re
-
 from six import string_types
 from six.moves import xrange
 
-from . import runtime
-
 
 class GeneratorSentinal(object):
-    
     def __init__(self, **kwargs):
         self.__dict__.update(**kwargs)
-        
+
     def __repr__(self):
         if hasattr(self, 'name'):
             return '<Sentinal:%s>' % self.name
@@ -21,12 +13,11 @@ class GeneratorSentinal(object):
 
 
 class Generator(object):
-    
     class no_strip(str):
         """A string class that will not have space removed."""
         def __repr__(self):
             return 'no_strip(%s)' % str.__repr__(self)
-    
+
     indent_str = '\t'
     endl = '\n'
     endl_no_break = '\\\n'
@@ -82,7 +73,8 @@ class Generator(object):
                 if token:
                     # Flush the buffer if we have non-white content as no
                     # lstrip command will get past this new token anyways.
-                    if buffer and token.strip() and not isinstance(token, self.no_strip):
+                    if buffer and token.strip() and not isinstance(
+                            token, self.no_strip):
                         for x in buffer:
                             yield x
                         buffer = [token]
@@ -97,18 +89,8 @@ class Generator(object):
         return self.indent_str * (self.depth + delta)
 
     def start_document(self):
-        return (
-            '<%%! from %s import runtime as __HAML %%>' % __package__ +
-            self.endl_no_break
-        )
-
-
-
-
-
-
-
-    
+        return ('<%%! from %s import runtime as __HAML %%>' % __package__ +
+                self.endl_no_break)
 
 
 def generate_mako(node):

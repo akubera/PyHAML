@@ -2,7 +2,6 @@ from __future__ import print_function
 
 from itertools import chain
 import ast
-import cgi
 import re
 import sys
 
@@ -24,7 +23,7 @@ class Base(object):
 
         This includes inline children, and control structure `else` clauses.
         '''
-        
+
         if self.inline_child:
             yield self.inline_child
         for x in self.children:
@@ -35,7 +34,7 @@ class Base(object):
             self.inline_child = node
         else:
             self.children.append(node)
-    
+
     def consume_sibling(self, node):
         return False
 
@@ -98,7 +97,7 @@ class FilterBase(Base):
 
 
 class GreedyBase(Base):
-    
+
     def __init__(self, *args, **kwargs):
         super(GreedyBase, self).__init__(*args, **kwargs)
         self._greedy_root = self
@@ -197,7 +196,7 @@ class Tag(Base):
         # Object references are actually handled by the attribute formatting
         # function.
         if self.object_reference:
-            kwargs_expr += (', ' if kwargs_expr else '') + '__obj_ref=' + self.object_reference
+            kwargs_expr += (', ' if kwargs_expr else self.object_reference)
             if self.object_reference_prefix:
                 kwargs_expr += ', __obj_ref_pre=' + self.object_reference_prefix
 
@@ -430,14 +429,14 @@ class Control(Base):
         if node.type == 'else' and self.else_ is None:
             self.else_ = node
             return True
-    
+
     def print_tree(self, depth, inline=False):
         super(Control, self).print_tree(depth)
         for node in self.elifs:
             node.print_tree(depth)
         if self.else_ is not None:
             self.else_.print_tree(depth)
-            
+
     def render(self, engine):
         to_chain = [self.render_start(engine), self.render_content(engine)]
         for node in self.elifs:
@@ -446,7 +445,7 @@ class Control(Base):
             to_chain.append(self.else_.render(engine))
         to_chain.append(self.render_end(engine))
         return chain(*to_chain)
-        
+
     def render_start(self, engine):
         yield engine.line_continuation
         yield engine.indent(-1)
@@ -494,7 +493,7 @@ class Python(FilterBase):
             yield engine.endl
         yield '%>'
         yield engine.endl_no_break
-    
+
     def __repr__(self):
         return '%s(%r%s)' % (
             self.__class__.__name__,
